@@ -2,7 +2,7 @@
 import imageio
 import numpy as np
 from skimage import exposure
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw 
 import sys
 
 filePatterns=[
@@ -10,6 +10,8 @@ filePatterns=[
     "blue3d_64x64x64",
     "blue2dx1d_64x64x64"
 ]
+
+label_font = ImageFont.truetype('arial.ttf', 10)
 
 # Combine the first three blue2d_64x64 images into a vec2 and a vec3, so we can compare it to a real vec3
 blue2D_RGB = np.empty([64, 64, 3], dtype=np.uint8)
@@ -237,3 +239,48 @@ for filePattern in filePatterns:
         image=imgs_c6[i]
         imageio.imwrite("out/" + filePattern + ".mag3d.xz." + str(i) + ".png", (image * 255.0).astype(np.uint8))        
 
+# Make a combined image showing 2d and 3d noise of true vectors vs combining scalar textures
+im11 = Image.open("out/blue2d_64x64_RG.png")
+im21 = Image.open("out/blue2d_64x64_RG.mag.png")
+im31 = Image.open("out/blue2d_64x64_RG.mag.combined.png")
+
+im12 = Image.open("source/blue2d_vec2_64x64.png")
+im22 = Image.open("out/blue2d_vec2_64x64.mag.png")
+im32 = Image.open("out/blue2d_vec2_64x64.mag.combined.png")
+
+im13 = Image.open("out/blue2d_64x64_RGB.png")
+im23 = Image.open("out/blue2d_64x64_RGB.mag.png")
+im33 = Image.open("out/blue2d_64x64_RGB.mag.combined.png")
+
+im14 = Image.open("source/blue2d_vec3_64x64.png")
+im24 = Image.open("out/blue2d_vec3_64x64.mag.png")
+im34 = Image.open("out/blue2d_vec3_64x64.mag.combined.png")
+
+imout = Image.new('RGB',(3*im11.size[0] + 6, 4*im11.size[1] + 9), (255, 255, 255))
+imout.paste(im11, (im11.size[0]*0, im11.size[1]*0))
+imout.paste(im21, (im11.size[0]*1+3, im11.size[1]*0))
+imout.paste(im31, (im11.size[0]*2+6, im11.size[1]*0))
+imout.paste(im12, (im11.size[0]*0, im11.size[1]*1+3))
+imout.paste(im22, (im11.size[0]*1+3, im11.size[1]*1+3))
+imout.paste(im32, (im11.size[0]*2+6, im11.size[1]*1+3))
+imout.paste(im13, (im11.size[0]*0, im11.size[1]*2+6))
+imout.paste(im23, (im11.size[0]*1+3, im11.size[1]*2+6))
+imout.paste(im33, (im11.size[0]*2+6, im11.size[1]*2+6))
+imout.paste(im14, (im11.size[0]*0, im11.size[1]*3+9))
+imout.paste(im24, (im11.size[0]*1+3, im11.size[1]*3+9))
+imout.paste(im34, (im11.size[0]*2+6, im11.size[1]*3+9))
+
+imout2 = Image.new('RGB',(imout.size[0] + 75, imout.size[1] + 25), (255, 255, 255))
+imout2.paste(imout, (70, 20))
+
+imout2_editable = ImageDraw.Draw(imout2)
+imout2_editable.text((5,52), "Scalar RG", (0, 0, 0), font=label_font)
+imout2_editable.text((5,119), "Vec2 RG", (0, 0, 0), font=label_font)
+imout2_editable.text((5,186), "Scalar RGB", (0, 0, 0), font=label_font)
+imout2_editable.text((5,253), "Vec3 RGB", (0, 0, 0), font=label_font)
+
+imout2_editable.text((85,5), "Texture", (0, 0, 0), font=label_font)
+imout2_editable.text((142,5), "DFT Single", (0, 0, 0), font=label_font)
+imout2_editable.text((211,5), "Combined", (0, 0, 0), font=label_font)
+
+imout2.save("out/_vec23.png")
