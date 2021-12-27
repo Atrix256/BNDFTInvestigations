@@ -20,9 +20,65 @@ imageio.imwrite("out/blue2d_64x64_RG.png", blue2D_RGB)
 blue2D_RGB[:,:,2] = imageio.imread("source/blue2d_64x64_2.png")
 imageio.imwrite("out/blue2d_64x64_RGB.png", blue2D_RGB)
 
+blue2D_RGB = blue2D_RGB.astype(float) / 255.0
 
-# TODO: DFT R,G,B of out/blue2d_64x64_RGB, and also do combined.
-# TODO: do the same for the actual vec3
+# make channel wise dft of the vec2 and vec3 images we made
+blue2D_R_DFT = np.fft.fft2(blue2D_RGB[:,:,0])
+blue2D_R_DFT2 = np.fft.fftshift(blue2D_R_DFT)
+blue2D_R_DFT3 = np.abs(blue2D_R_DFT2);
+blue2D_R_DFT4 = np.log(1+blue2D_R_DFT3)
+blue2D_R_DFT5 = blue2D_R_DFT4 / max(1, np.amax(blue2D_R_DFT4))
+
+blue2D_G_DFT = np.fft.fft2(blue2D_RGB[:,:,1])
+blue2D_G_DFT2 = np.fft.fftshift(blue2D_G_DFT)
+blue2D_G_DFT3 = np.abs(blue2D_G_DFT2);
+blue2D_G_DFT4 = np.log(1+blue2D_G_DFT3)
+blue2D_G_DFT5 = blue2D_G_DFT4 / max(1, np.amax(blue2D_G_DFT4))
+
+blue2D_B_DFT = np.fft.fft2(blue2D_RGB[:,:,1])
+blue2D_B_DFT2 = np.fft.fftshift(blue2D_B_DFT)
+blue2D_B_DFT3 = np.abs(blue2D_B_DFT2);
+blue2D_B_DFT4 = np.log(1+blue2D_B_DFT3)
+blue2D_B_DFT5 = blue2D_B_DFT4 / max(1, np.amax(blue2D_B_DFT4))
+
+blue2D_RGB[:,:,0] = blue2D_R_DFT5
+blue2D_RGB[:,:,1] = blue2D_G_DFT5
+blue2D_RGB[:,:,2] = 0
+imageio.imwrite("out/blue2d_64x64_RG.mag.png", (blue2D_RGB * 255.0).astype(np.uint8))
+blue2D_RGB[:,:,2] = blue2D_B_DFT5
+imageio.imwrite("out/blue2d_64x64_RGB.mag.png", (blue2D_RGB * 255.0).astype(np.uint8))
+
+# make a combined DFT
+blue2D_R_DFT = np.fft.fft2(blue2D_RGB[:,:,0])
+blue2D_R_DFT2 = np.fft.fftshift(blue2D_R_DFT)
+
+blue2D_G_DFT = np.fft.fft2(blue2D_RGB[:,:,1])
+blue2D_G_DFT2 = np.fft.fftshift(blue2D_G_DFT)
+
+blue2D_B_DFT = np.fft.fft2(blue2D_RGB[:,:,1])
+blue2D_B_DFT2 = np.fft.fftshift(blue2D_B_DFT)
+
+blue2D_DFT2 = np.sqrt(blue2D_R_DFT2*blue2D_R_DFT2 + blue2D_G_DFT2*blue2D_G_DFT2)
+blue2D_DFT3 = np.abs(blue2D_DFT2);
+blue2D_DFT4 = np.log(1+blue2D_DFT3)
+blue2D_DFT5 = blue2D_DFT4 / max(1, np.amax(blue2D_DFT4))
+imageio.imwrite("out/blue2d_64x64_RG.mag.combined.png", (blue2D_DFT5 * 255.0).astype(np.uint8))
+
+blue2D_DFT2 = np.sqrt(blue2D_R_DFT2*blue2D_R_DFT2 + blue2D_G_DFT2*blue2D_G_DFT2 + blue2D_B_DFT2*blue2D_B_DFT2)
+blue2D_DFT3 = np.abs(blue2D_DFT2);
+blue2D_DFT4 = np.log(1+blue2D_DFT3)
+blue2D_DFT5 = blue2D_DFT4 / max(1, np.amax(blue2D_DFT4))
+imageio.imwrite("out/blue2d_64x64_RGB.mag.combined.png", (blue2D_DFT5 * 255.0).astype(np.uint8))
+
+
+# make channel wise dft of the actual vec2 and vec3 blue noise images
+blue2D_RGB = imageio.imread("source/blue2d_vec2_64x64.png")
+#print(blue2D_RGB)
+
+#sys.exit()
+
+
+# TODO: do the same for the actual vec2 and vec3
 # TODO: should we do the same for vec2? i think so
 
 
@@ -54,7 +110,7 @@ for filePattern in filePatterns:
 
     avgDFT2 = np.log(1+avgDFT)
     avgDFT3 = avgDFT2 / max(1, np.amax(avgDFT2))
-    imageio.imwrite("out/" + filePattern + ".mag2d.combined.xy.png", (avgDFT3 * 255.0).astype(np.uint8))
+    imageio.imwrite("out/" + filePattern + ".mag2d.avg.xy.png", (avgDFT3 * 255.0).astype(np.uint8))
 
     # Rotate the images 90 degress to make the XZ DFTs
     imagesRot = np.rot90(images, axes=(0,1))
@@ -80,7 +136,7 @@ for filePattern in filePatterns:
 
     avgDFT2 = np.log(1+avgDFT)
     avgDFT3 = avgDFT2 / max(1, np.amax(avgDFT2))
-    imageio.imwrite("out/" + filePattern + ".mag2d.combined.xz.png", (avgDFT3 * 255.0).astype(np.uint8))
+    imageio.imwrite("out/" + filePattern + ".mag2d.avg.xz.png", (avgDFT3 * 255.0).astype(np.uint8))
 
     # Make a XY sliced 3D DFT
     imgs_c2 = np.fft.fftn(images)
