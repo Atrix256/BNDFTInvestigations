@@ -201,6 +201,8 @@ for filePattern in filePatterns:
     for i in range(imagesRot.shape[2]):
         image=imagesRot[i]
 
+        imageio.imwrite("out/" + filePattern + "_" + str(i) + ".xz.png", (image * 255.0).astype(np.uint8))
+
         img_c2 = np.fft.fft2(image)
         img_c3 = np.fft.fftshift(img_c2)
         img_c4 = np.abs(img_c3);
@@ -284,3 +286,61 @@ imout2_editable.text((142,5), "DFT Single", (0, 0, 0), font=label_font)
 imout2_editable.text((211,5), "Combined", (0, 0, 0), font=label_font)
 
 imout2.save("out/_vec23.png")
+
+# Make a diagram of 2D XY and XZ DFTs
+im11 = Image.open("source/blue2d_64x64_0.png")
+im21 = Image.open("out/blue2d_64x64.mag2d.0.xy.png")
+im31 = Image.open("out/blue2d_64x64.mag2d.avg.xy.png")
+im41 = Image.open("out/blue2d_64x64_0.xz.png")
+im51 = Image.open("out/blue2d_64x64.mag2d.0.xz.png")
+im61 = Image.open("out/blue2d_64x64.mag2d.avg.xz.png")
+
+im12 = Image.open("source/blue2dx1d_64x64x64_0.png")
+im22 = Image.open("out/blue2dx1d_64x64x64.mag2d.0.xy.png")
+im32 = Image.open("out/blue2dx1d_64x64x64.mag2d.avg.xy.png")
+im42 = Image.open("out/blue2dx1d_64x64x64_0.xz.png")
+im52 = Image.open("out/blue2dx1d_64x64x64.mag2d.0.xz.png")
+im62 = Image.open("out/blue2dx1d_64x64x64.mag2d.avg.xz.png")
+
+im13 = Image.open("source/blue3d_64x64x64_0.png")
+im23 = Image.open("out/blue3d_64x64x64.mag2d.0.xy.png")
+im33 = Image.open("out/blue3d_64x64x64.mag2d.avg.xy.png")
+im43 = Image.open("out/blue3d_64x64x64_0.xz.png")
+im53 = Image.open("out/blue3d_64x64x64.mag2d.0.xz.png")
+im63 = Image.open("out/blue3d_64x64x64.mag2d.avg.xz.png")
+
+imout = Image.new('RGB',(6*im11.size[0] + 15, 3*im11.size[1] + 6), (255, 255, 255))
+imout.paste(im11, (im11.size[0]*0, im11.size[1]*0))
+imout.paste(im21, (im11.size[0]*1+3, im11.size[1]*0))
+imout.paste(im31, (im11.size[0]*2+6, im11.size[1]*0))
+imout.paste(im41, (im11.size[0]*3+9, im11.size[1]*0))
+imout.paste(im51, (im11.size[0]*4+12, im11.size[1]*0))
+imout.paste(im61, (im11.size[0]*5+15, im11.size[1]*0))
+imout.paste(im12, (im11.size[0]*0, im11.size[1]*1+3))
+imout.paste(im22, (im11.size[0]*1+3, im11.size[1]*1+3))
+imout.paste(im32, (im11.size[0]*2+6, im11.size[1]*1+3))
+imout.paste(im42, (im11.size[0]*3+9, im11.size[1]*1+3))
+imout.paste(im52, (im11.size[0]*4+12, im11.size[1]*1+3))
+imout.paste(im62, (im11.size[0]*5+15, im11.size[1]*1+3))
+imout.paste(im13, (im11.size[0]*0, im11.size[1]*2+6))
+imout.paste(im23, (im11.size[0]*1+3, im11.size[1]*2+6))
+imout.paste(im33, (im11.size[0]*2+6, im11.size[1]*2+6))
+imout.paste(im43, (im11.size[0]*3+9, im11.size[1]*2+6))
+imout.paste(im53, (im11.size[0]*4+12, im11.size[1]*2+6))
+imout.paste(im63, (im11.size[0]*5+15, im11.size[1]*2+6))
+imout2 = Image.new('RGB',(imout.size[0] + 75, imout.size[1] + 25), (255, 255, 255))
+imout2.paste(imout, (70, 20))
+
+imout2_editable = ImageDraw.Draw(imout2)
+imout2_editable.text((5,52), "Blue 2D", (0, 0, 0), font=label_font)
+imout2_editable.text((5,119), "Blue 2Dx1D", (0, 0, 0), font=label_font)
+imout2_editable.text((5,186), "Blue 3D", (0, 0, 0), font=label_font)
+
+imout2_editable.text((75,5), "Texture(XY)", (0, 0, 0), font=label_font)
+imout2_editable.text((147,5), "DFT(XY)", (0, 0, 0), font=label_font)
+imout2_editable.text((205,5), "Average(XY)", (0, 0, 0), font=label_font)
+imout2_editable.text((275,5), "Texture(XZ)", (0, 0, 0), font=label_font)
+imout2_editable.text((350,5), "DFT(XZ)", (0, 0, 0), font=label_font)
+imout2_editable.text((407,5), "Average(XZ)", (0, 0, 0), font=label_font)
+
+imout2.save("out/_DFT2DXY.png")
