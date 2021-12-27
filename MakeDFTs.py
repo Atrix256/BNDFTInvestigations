@@ -11,6 +11,11 @@ filePatterns=[
     "blue2dx1d_64x64x64"
 ]
 
+projections=[
+    "xy",
+    "xz"
+]
+
 label_font = ImageFont.truetype('arial.ttf', 10)
 
 # Combine the first three blue2d_64x64 images into a vec2 and a vec3, so we can compare it to a real vec3
@@ -344,3 +349,13 @@ imout2_editable.text((350,5), "DFT(XZ)", (0, 0, 0), font=label_font)
 imout2_editable.text((407,5), "Average(XZ)", (0, 0, 0), font=label_font)
 
 imout2.save("out/_DFT2DXY.png")
+
+# make 3D dft images
+for filePattern in filePatterns:
+    for projection in projections:
+        imout = Image.new('RGB',(67*8+3, 67*8+3), (255, 255, 255))
+        for i in range(64):
+            x = i % 8
+            y = int(i / 8)
+            imout.paste(Image.open("out/"+filePattern+".mag3d."+projection+"."+str(i)+".png"), (x*67+3,y*67+3))
+        imout.save("out/_"+filePattern+".mag3d."+projection+".png")
